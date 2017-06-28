@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		E3A027991F00B94700D7B306 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E3A027981F00B94700D7B306 /* main.m */; };
-		E3A027A11F00BA9B00D7B306 /* WYDirectSort.c in Sources */ = {isa = PBXBuildFile; fileRef = E3A0279F1F00BA9B00D7B306 /* WYDirectSort.c */; };
+		E3A027A11F00BA9B00D7B306 /* WYDirectSort.c in Sources */ = {isa = PBXBuildFile; fileRef = E3A0279F1F00BA9B00D7B306 /* WYDirectSort.c */; settings = {COMPILER_FLAGS = "-w"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -257,6 +257,7 @@
 				E3A0279E1F00B94700D7B306 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

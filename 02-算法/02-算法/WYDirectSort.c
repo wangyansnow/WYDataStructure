@@ -13,6 +13,7 @@ void initForSort(ForSort *fs, int a) {
     fs->key = a;
 }
 
+#pragma mark - 插入排序
 void directInsertionSort(ForSort sorts[], int n) {
     
     ForSort lastSort = sorts[0];
@@ -129,8 +130,124 @@ void shellSort(ForSort sorts[], int n, int s) {
     }
 }
 
-ForSort * getRandomSorts(int count) {
-    ForSort *sorts = malloc(sizeof(ForSort) * 100);
+#pragma mark - 选择排序
+// 注意点：找到待排序记录中j所在的值为最小，将其放到已经排好序的末尾i的位置，这时的操作应该是交换i和j位置对应的值
+/** 思想
+ 1、每次在待排序记录中选择排序码最小的记录，顺序放在已排序的记录最后，直到排序完成
+ */
+void directSelectSort(ForSort sorts[], int n) {
+    
+    for (int i = 0; i < n - 1; i++) {
+        ForSort sort = sorts[i];
+        
+        int tempJ = -1;
+        for (int j = i + 1; j < n; j++) { // 找到排序码最小的记录
+            ForSort nextSort = sorts[j];
+            if (nextSort.key < sort.key) {
+                sort = nextSort;
+                tempJ = j;
+            }
+        }
+        
+        if (tempJ > -1) {
+            sorts[tempJ] = sorts[i];
+        }
+        sorts[i] = sort;
+    }
+}
+
+/** 思想
+ 1、把所有的待选择排序记录分为两两一组进行比较，把得出的小的结果的下标保存起来
+ 2、对得到的结果继续进行第一步操作直到找到排序码最小的记录
+ */
+void treeSelectSort(ForSort sorts[], int n) {
+    
+    int count = n - 1;
+    for (int i = 0; i < count; i++) {
+
+        int number = n - i;
+        int groupCount = (number - 1) / 2 + 1;
+      
+        // 记录所有待排序记录的下标
+        int *locations = malloc(sizeof(int) * number);
+        for (int k = 0; k < number; k++) {
+            locations[k] = k + i;
+        }
+        
+        while (groupCount > 1) {
+            
+            int *tempLocations = malloc(sizeof(int) * groupCount);
+            for (int j = 0; j < groupCount; j++) {
+                int index = locations[j * 2];
+                int nextLocation = j * 2 + 1;
+                
+                if (nextLocation >= number) { // 这组只有一个，不用比较
+                    tempLocations[j] = locations[index];
+                    ForSort sort = sorts[index];
+                    continue;
+                }
+                
+                // 有两个，取排序码小的的下标
+                int nextIndex = locations[nextLocation];
+                ForSort currentSort = sorts[index];
+                ForSort nextSort = sorts[nextIndex];
+                
+                tempLocations[j] = currentSort.key < nextSort.key ? index : nextIndex;
+            }
+            
+            free(locations);
+            locations = tempLocations;
+            number = groupCount;
+            groupCount = (number -1) / 2 + 1;
+        }
+        
+        // 此时只有最后一组，里面可能有一个或两个记录
+        int replaceIndex;
+        if (number == 1) {
+            replaceIndex = locations[0];
+        } else {
+            int firstIndex = locations[0];
+            int lastIndex = locations[1];
+            replaceIndex = sorts[firstIndex].key < sorts[lastIndex].key ? firstIndex : lastIndex;
+        }
+        
+        if (replaceIndex != i) {
+            ForSort replaceSort = sorts[replaceIndex];
+            sorts[replaceIndex] = sorts[i];
+            sorts[i] = replaceSort;
+            
+            ForSort sort = sorts[replaceIndex];
+        }
+        
+        free(locations);
+    }
+    
+}
+
+#pragma mark - TestSelect
+void testSelectSort(int count) {
+    ForSort *sorts = getRandomSorts(count);
+    
+    directSelectSort(sorts, count);
+    
+    for (int i = 0; i < count; i++) {
+        printf("sort.key = %d \n", sorts[i].key);
+    }
+}
+
+void testTreeSort(int count) {
+    ForSort *sorts = getRandomSorts(count);
+    
+    treeSelectSort(sorts, count);
+    
+    for (int i = 0; i < count; i++) {
+        printf("sort.key = %d \n", sorts[i].key);
+    }
+}
+
+#pragma mark - TestInsertion
+ForSort* getRandomSorts(int count) {
+    ForSort *sorts = malloc(sizeof(ForSort) * count);
     for (int i = 0; i < count; i++) {
         ForSort *sort = malloc(sizeof(ForSort));
         initForSort(sort, arc4random_uniform(200));
@@ -172,7 +289,6 @@ void testShellSort(int count, int s) {
         printf("sort.key = %d\n", sort.key);
     }
 }
-
 
 
 
