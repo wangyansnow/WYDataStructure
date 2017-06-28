@@ -13,8 +13,13 @@ void testEfficiencySort();
 
 int main(int argc, const char * argv[]) {
     
-    testTreeSort(10);
+    testTreeSelectSort(1000);
     
+    int count = 100;
+    ForSort *sorts = getRandomSorts(count);
+    CFTimeInterval time1 = CFAbsoluteTimeGetCurrent();
+    treeSelectSort(sorts, count);
+    printf("treeSelectSort.time = %f \n", CFAbsoluteTimeGetCurrent() - time1);
     
     return 0;
 }

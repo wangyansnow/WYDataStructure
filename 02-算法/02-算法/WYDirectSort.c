@@ -159,69 +159,62 @@ void directSelectSort(ForSort sorts[], int n) {
 /** 思想
  1、把所有的待选择排序记录分为两两一组进行比较，把得出的小的结果的下标保存起来
  2、对得到的结果继续进行第一步操作直到找到排序码最小的记录
- */
+*/
 void treeSelectSort(ForSort sorts[], int n) {
     
     int count = n - 1;
     for (int i = 0; i < count; i++) {
-
+        
         int number = n - i;
-        int groupCount = (number - 1) / 2 + 1;
-      
-        // 记录所有待排序记录的下标
-        int *locations = malloc(sizeof(int) * number);
+        int *locations = malloc(sizeof(int) * number); // 存放下标
         for (int k = 0; k < number; k++) {
             locations[k] = k + i;
         }
-        
+        int groupCount = (number - 1) / 2 + 1;
         while (groupCount > 1) {
-            
-            int *tempLocations = malloc(sizeof(int) * groupCount);
+            int *tempLocations = malloc(sizeof(int) * groupCount); // 存放较小值得下标
             for (int j = 0; j < groupCount; j++) {
                 int index = locations[j * 2];
                 int nextLocation = j * 2 + 1;
-                
-                if (nextLocation >= number) { // 这组只有一个，不用比较
-                    tempLocations[j] = locations[index];
-                    ForSort sort = sorts[index];
+                if (nextLocation >= number) { // 下标大于等于个数，这组只有一个数
+                    tempLocations[j] = index;
                     continue;
                 }
-                
-                // 有两个，取排序码小的的下标
                 int nextIndex = locations[nextLocation];
-                ForSort currentSort = sorts[index];
+                
+                ForSort firstSort = sorts[index];
                 ForSort nextSort = sorts[nextIndex];
                 
-                tempLocations[j] = currentSort.key < nextSort.key ? index : nextIndex;
+                tempLocations[j] = firstSort.key < nextSort.key ? index : nextIndex;
             }
             
             free(locations);
             locations = tempLocations;
             number = groupCount;
-            groupCount = (number -1) / 2 + 1;
+            groupCount = (number - 1 ) / 2 + 1;
         }
         
-        // 此时只有最后一组，里面可能有一个或两个记录
         int replaceIndex;
         if (number == 1) {
             replaceIndex = locations[0];
         } else {
             int firstIndex = locations[0];
-            int lastIndex = locations[1];
-            replaceIndex = sorts[firstIndex].key < sorts[lastIndex].key ? firstIndex : lastIndex;
+            int secondIndex = locations[1];
+            
+            ForSort firstSort = sorts[firstIndex];
+            ForSort secondSort = sorts[secondIndex];
+            
+            replaceIndex = firstSort.key < secondSort.key ? firstIndex : secondIndex;
         }
-        
-        if (replaceIndex != i) {
+    
+        if (i != replaceIndex) {
             ForSort replaceSort = sorts[replaceIndex];
             sorts[replaceIndex] = sorts[i];
             sorts[i] = replaceSort;
-            
-            ForSort sort = sorts[replaceIndex];
         }
         
         free(locations);
     }
-    
 }
 
 #pragma mark - TestSelect
@@ -235,13 +228,23 @@ void testSelectSort(int count) {
     }
 }
 
-void testTreeSort(int count) {
+void testTreeSelectSort(int count) {
     ForSort *sorts = getRandomSorts(count);
-    
     treeSelectSort(sorts, count);
+    int j = -1;
     
-    for (int i = 0; i < count; i++) {
-        printf("sort.key = %d \n", sorts[i].key);
+    for (int i = 1; i < count; i++) {
+        ForSort lastSort = sorts[i - 1];
+        ForSort sort = sorts[i];
+        
+        if (sort.key < lastSort.key) {
+            printf("排序失败 \n");
+            j = 1;
+        }
+    }
+    
+    if (j == -1) {
+        printf("排序成功 \n");
     }
 }
 
@@ -250,10 +253,20 @@ ForSort* getRandomSorts(int count) {
     ForSort *sorts = malloc(sizeof(ForSort) * count);
     for (int i = 0; i < count; i++) {
         ForSort *sort = malloc(sizeof(ForSort));
-        initForSort(sort, arc4random_uniform(200));
+        initForSort(sort, arc4random_uniform(count));
         sorts[i] = *sort;
     }
 
+    return sorts;
+}
+
+ForSort* getRegularSorts(int count) {
+    ForSort *sorts = malloc(sizeof(ForSort) * count);
+    for (int i = 0; i < count; i++) {
+        ForSort *sort = malloc(sizeof(ForSort));
+        initForSort(sort, count - i);
+        sorts[i] = *sort;
+    }
     return sorts;
 }
 

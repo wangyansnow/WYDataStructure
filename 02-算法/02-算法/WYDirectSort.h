@@ -33,12 +33,14 @@ void directSelectSort(ForSort sorts[], int n);
 void treeSelectSort(ForSort sorts[], int n);
 
 ForSort* getRandomSorts(int count);
+ForSort* getRegularSorts(int count);
+
 void testDirectSort(int count);
 void testBinarySort(int count);
 void testShellSort(int count, int s);
 
 void testSelectSort(int count);
-void testTreeSort(int count);
+void testTreeSelectSort(int count);
 
 
 #endif /* WYDirectSort_h */
