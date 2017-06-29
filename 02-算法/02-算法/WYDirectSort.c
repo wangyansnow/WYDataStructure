@@ -8,6 +8,7 @@
 
 #include "WYDirectSort.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 void initForSort(ForSort *fs, int a) {
     fs->key = a;
@@ -217,6 +218,78 @@ void treeSelectSort(ForSort sorts[], int n) {
     }
 }
 
+#pragma mark - 快速排序
+/** 思想
+ 1、取任意一个记录的排序码（一般第一个记录）作为基准数
+ 2、把小于等于基准数的排序码记录放到左边，大于基准数的排序码记录放到右边
+ 3、重复对左边和右边的记录进行 1和2 的操作
+ 4、直到左边和右边的记录为0或者1的时候排序完成
+ 算法实现
+ 1、取第一个记录的排序码作为基准数，第一个记录空位
+ 2、最后一个记录和基准数进行比较，如果小于等于基准数，把最后一个记录放到第一个记录的位置，最后一个记录的位置为空位，否则取倒数第二个记录和基准数进行比较
+ 3、取第二个记录和基准数进行比较，如果大于基准数，把第二个记录放到最后一个位置，第二个记录为空位
+ 4、如果小于登录基准数，取第三个记录和基准数进行比较
+ */
+
+void quickSortPart(ForSort sorts[], int small, int big) {
+    if (big <= small) {
+        return;
+    }
+    
+    int initialSmall = small;
+    int initialBig = big;
+    
+    ForSort standardSort = sorts[small];
+    bool isTrailing = true;
+    int blankIndex = small;
+    small++;
+    
+    while (big >= small) {
+        if (isTrailing) {
+            ForSort sort = sorts[big];
+            if (sort.key <= standardSort.key) {
+                sorts[blankIndex] = sort;
+                blankIndex = big;
+                isTrailing = false;
+            }
+            big--;
+        } else {
+            ForSort sort = sorts[small];
+            if (sort.key > standardSort.key) {
+                sorts[blankIndex] = sort;
+                blankIndex = small;
+                isTrailing = true;
+            }
+            small++;
+        }
+    }
+    
+    sorts[blankIndex] = standardSort;
+
+    int leftSmall = initialSmall;
+    int leftBig = blankIndex - 1;
+    
+    int rightSmall = blankIndex + 1;
+    int rightBig = initialBig;
+    
+    quickSortPart(sorts, leftSmall, leftBig);
+    quickSortPart(sorts, rightSmall, rightBig);
+}
+
+void quickSort(ForSort sorts[], int n) {
+    quickSortPart(sorts, 0, n - 1);
+}
+
+#pragma mark - TestQuickSort
+void testQuickSort(int count) {
+    ForSort *sorts = getRandomSorts(count);
+    quickSort(sorts, count);
+    
+    for (int i = 0; i < count; i++) {
+        printf("sort.key = %d \n", sorts[i].key);
+    }    
+}
+
 #pragma mark - TestSelect
 void testSelectSort(int count) {
     ForSort *sorts = getRandomSorts(count);
@@ -231,21 +304,8 @@ void testSelectSort(int count) {
 void testTreeSelectSort(int count) {
     ForSort *sorts = getRandomSorts(count);
     treeSelectSort(sorts, count);
-    int j = -1;
     
-    for (int i = 1; i < count; i++) {
-        ForSort lastSort = sorts[i - 1];
-        ForSort sort = sorts[i];
-        
-        if (sort.key < lastSort.key) {
-            printf("排序失败 \n");
-            j = 1;
-        }
-    }
-    
-    if (j == -1) {
-        printf("排序成功 \n");
-    }
+    checkRight(sorts, count);
 }
 
 #pragma mark - TestInsertion
@@ -303,7 +363,20 @@ void testShellSort(int count, int s) {
     }
 }
 
-
+#pragma mark - Check
+void checkRight(ForSort sorts[], int count) {
+    int j = -1;
+    for (int i = 1; i < count; i++) {
+        ForSort lastSort = sorts[i - 1];
+        ForSort sort = sorts[i];
+        
+        if (sort.key < lastSort.key) {
+            printf("排序失败 \n");
+            j = 1;
+        }
+    }
+    if (j == -1) printf("排序成功 \n");
+}
 
 
 
