@@ -35,6 +35,9 @@ void treeSelectSort(ForSort sorts[], int n);
 /// 快速排序 [不稳定] 更加健壮 O(nlog2n)
 void quickSort(ForSort sorts[], int n);
 
+/// 二路并归排序
+void mergeSort(ForSort sorts[], int n);
+
 ForSort* getRandomSorts(int count);
 ForSort* getRegularSorts(int count);
 
@@ -46,6 +49,8 @@ void testSelectSort(int count);
 void testTreeSelectSort(int count);
 
 void testQuickSort(int count);
+
+void testMergeSort(int count);
 
 void checkRight(ForSort sorts[], int count);
 

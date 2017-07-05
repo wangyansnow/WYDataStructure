@@ -280,6 +280,86 @@ void quickSort(ForSort sorts[], int n) {
     quickSortPart(sorts, 0, n - 1);
 }
 
+#pragma mark - 并归排序
+/** 思路
+ 1、每次将两个子文件合并成一个较大的子文件
+ 2、直到最后将两个n/2的子文件合并完成排序
+ */
+void mergeSort(ForSort sorts[], int n) {
+    
+    ForSort *tempSorts = malloc(sizeof(ForSort) * n);
+    
+    // 1.开始子文件的长度
+    int partLength = 1;
+    
+    while (partLength < n) {
+        
+        for (int i = 0; i < n; i += partLength * 2) {
+            int firstStart = i;
+            int secondStart = i + partLength;
+            
+            if (secondStart < n) { // 有两组需要进行合并
+                
+                int firstK = firstStart;
+                int secondK = secondStart;
+                int tempIndex = firstStart;
+                int secondLimit = secondStart + partLength + 1;
+                secondLimit = secondLimit < n ? secondLimit : n;
+                
+                while (firstK < secondStart || secondK < secondLimit) {
+                    
+                    ForSort firstSort = sorts[firstK];
+                    ForSort secondSort = sorts[secondK];
+                    
+                    if (secondSort.key < firstSort.key) {
+                        tempSorts[tempIndex] = secondSort;
+                        secondK++;
+                        tempIndex++;
+                        
+                        if (secondK == secondLimit) { // 第二组已经走完,只剩下第一组
+                            for (int j = firstK; j < secondStart; j++) {
+                                tempSorts[tempIndex] = sorts[j];
+                                tempIndex++;
+                            }
+                            break;
+                        }
+                        
+                    } else {
+                        tempSorts[tempIndex] = firstSort;
+                        firstK++;
+                        tempIndex++;
+                        
+                        if (firstK == secondStart) { // 第一组已经走完,只剩下第二组
+                            for (int j = secondK; j < secondLimit; j++) {
+                                tempSorts[tempIndex] = sorts[j];
+                                tempIndex++;
+                            }
+                            break;
+                        }
+                    }
+                }
+            } else { // 只有一组,没有第二组
+                for (int j = i; j < n; j++) {
+                    tempSorts[j] = sorts[j];
+                }
+            }
+        }
+        // 2.并归后子文件长度增加一倍
+        partLength <<= 1;
+    }
+   
+}
+
+#pragma mark - TestMergeSort
+void testMergeSort(int count) {
+    ForSort *sorts = getRandomSorts(count);
+    mergeSort(sorts, count);
+    
+    for (int i = 0; i < count; i++) {
+        printf("sort.key = %d \n", sorts[i].key);
+    }
+}
+
 #pragma mark - TestQuickSort
 void testQuickSort(int count) {
     ForSort *sorts = getRandomSorts(count);
